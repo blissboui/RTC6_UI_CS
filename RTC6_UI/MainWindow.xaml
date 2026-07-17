@@ -1,0 +1,201 @@
+﻿<!-- ========================================================
+파일: MainWindow.xaml
+역할: RTC6 제어 및 DXF 로드 화면
+========================================================= -->
+
+<Window x:Class="RTC6_UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RTC6 Control UI"
+        Width="1050"
+        Height="800"
+        MinWidth="900"
+        MinHeight="700"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="160"/>
+        </Grid.RowDefinitions>
+
+        <!-- RTC6 상태 -->
+        <GroupBox Grid.Row="0" Header="RTC6 상태" Margin="0,0,0,10">
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock Text="현재 상태: " VerticalAlignment="Center"/>
+                <TextBlock x:Name="StatusText"
+                           Text="연결 안 됨"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- RTC6 연결 -->
+        <GroupBox Grid.Row="1" Header="연결" Margin="0,0,0,10">
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <Button x:Name="InitializeButton"
+                        Width="100"
+                        Height="35"
+                        Margin="0,0,10,0"
+                        Content="초기화"
+                        Click="InitializeButton_Click"/>
+
+                <Button x:Name="ShutdownButton"
+                        Width="100"
+                        Height="35"
+                        Content="연결 종료"
+                        Click="ShutdownButton_Click"/>
+
+                <CheckBox x:Name="SimulationCheckBox"
+                          Margin="20,0,0,0"
+                          Content="시뮬레이션 모드"
+                          IsChecked="True"
+                          VerticalAlignment="Center"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- 수동 이동 -->
+        <GroupBox Grid.Row="2" Header="수동 이동" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Margin="0,0,5,0"
+                           Text="X:"
+                           VerticalAlignment="Center"/>
+
+                <TextBox x:Name="XTextBox"
+                         Grid.Column="1"
+                         Margin="0,0,15,0"
+                         Text="0"
+                         VerticalContentAlignment="Center"/>
+
+                <TextBlock Grid.Column="2"
+                           Margin="0,0,5,0"
+                           Text="Y:"
+                           VerticalAlignment="Center"/>
+
+                <TextBox x:Name="YTextBox"
+                         Grid.Column="3"
+                         Margin="0,0,15,0"
+                         Text="0"
+                         VerticalContentAlignment="Center"/>
+
+                <Button x:Name="MoveButton"
+                        Grid.Column="4"
+                        Margin="0,0,10,0"
+                        Content="이동"
+                        Click="MoveButton_Click"/>
+
+                <Button x:Name="StopButton"
+                        Grid.Column="5"
+                        Content="정지"
+                        Click="StopButton_Click"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- DXF -->
+        <GroupBox Grid.Row="3" Header="DXF 파일" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 파일 선택 -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="DxfPathTextBox"
+                             Margin="0,0,10,0"
+                             IsReadOnly="True"
+                             VerticalContentAlignment="Center"/>
+
+                    <Button x:Name="OpenDxfButton"
+                            Grid.Column="1"
+                            Height="30"
+                            Margin="0,0,10,0"
+                            Content="DXF 열기"
+                            Click="OpenDxfButton_Click"/>
+
+                    <Button x:Name="CancelDxfLoadButton"
+                            Grid.Column="2"
+                            Height="30"
+                            Content="로드 취소"
+                            IsEnabled="False"
+                            Click="CancelDxfLoadButton_Click"/>
+                </Grid>
+
+                <!-- 진행 상태 -->
+                <Grid Grid.Row="1" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="230"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ProgressBar x:Name="DxfProgressBar"
+                                 Height="22"
+                                 Margin="0,0,10,0"
+                                 Minimum="0"
+                                 Maximum="100"/>
+
+                    <TextBlock x:Name="DxfProgressText"
+                               Grid.Column="1"
+                               Text="대기 중"
+                               VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- DXF 요약 -->
+                <TextBlock x:Name="DxfResultText"
+                           Grid.Row="2"
+                           Margin="0,10,0,10"
+                           Text="DXF 파일을 선택하세요."
+                           TextWrapping="Wrap"/>
+
+                <!-- Jump / Mark 명령 -->
+                <DataGrid x:Name="DxfCommandGrid"
+                          Grid.Row="3"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single" SelectionChanged="DxfCommandGrid_SelectionChanged">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="번호" Width="60" Binding="{Binding Index}"/>
+                        <DataGridTextColumn Header="명령" Width="90" Binding="{Binding Type}"/>
+                        <DataGridTextColumn Header="X (mm)" Width="140" Binding="{Binding X, StringFormat=F4}"/>
+                        <DataGridTextColumn Header="Y (mm)" Width="140" Binding="{Binding Y, StringFormat=F4}"/>
+                        <DataGridTextColumn Header="레이어" Width="*" Binding="{Binding LayerName}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+
+        <!-- 로그 -->
+        <GroupBox Grid.Row="4" Header="로그">
+            <TextBox x:Name="LogTextBox"
+                     Margin="10"
+                     AcceptsReturn="True"
+                     FontFamily="Consolas"
+                     HorizontalScrollBarVisibility="Auto"
+                     IsReadOnly="True"
+                     TextWrapping="NoWrap"
+                     VerticalScrollBarVisibility="Auto"/>
+        </GroupBox>
+    </Grid>
+</Window>

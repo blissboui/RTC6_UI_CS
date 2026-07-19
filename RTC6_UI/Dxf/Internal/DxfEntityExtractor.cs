@@ -9,6 +9,10 @@ using RTC6_UI.Dxf.Models;
 
 namespace RTC6_UI.Dxf.Internal
 {
+    /// <summary>
+    /// DXF 문서의 Entity를 순회하고 종류에 맞는 변환 처리를 호출합니다.
+    /// 레이어 필터링, 가시성 검사, INSERT 전개 및 지원 Entity 판별을 담당합니다.
+    /// </summary>
     internal sealed class DxfEntityExtractor
     {
         private readonly DxfGeometryConverter _geometryConverter;

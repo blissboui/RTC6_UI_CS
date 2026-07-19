@@ -5,6 +5,10 @@ using RTC6_UI.Dxf.Models;
 
 namespace RTC6_UI.Dxf.Internal
 {
+    /// <summary>
+    /// DXF 원본 3차원 좌표를 mm 단위의 2차원 좌표로 변환합니다.
+    /// 단위, 배율, 축 반전, 회전, 오프셋 및 Z 평면 검사를 적용합니다.
+    /// </summary>
     internal sealed class DxfCoordinateTransformer
     {
         public DxfPathPoint Transform(
@@ -21,8 +25,7 @@ namespace RTC6_UI.Dxf.Internal
                 );
             }
 
-            double sourceZMillimeter =
-                source.Z * options.SourceUnitToMillimeter;
+            double sourceZMillimeter = source.Z * options.SourceUnitToMillimeter;
 
             if (Math.Abs(sourceZMillimeter) >
                 options.ZToleranceMillimeter)

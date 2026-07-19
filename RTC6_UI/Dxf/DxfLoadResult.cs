@@ -4,6 +4,10 @@ using RTC6_UI.Dxf.Models;
 
 namespace RTC6_UI.Dxf
 {
+    /// <summary>
+    /// DXF 파일 처리 결과를 저장합니다.
+    /// 변환된 Contour, Jump/Mark 명령, 경계 정보, 통계, 경고 및 오류 정보를 포함합니다.
+    /// </summary>
     public sealed class DxfLoadResult
     {
         public bool Success { get; internal set; }

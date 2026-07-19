@@ -7,6 +7,10 @@ using RTC6_UI.Dxf.Models;
 
 namespace RTC6_UI.Dxf.Internal
 {
+    /// <summary>
+    /// LINE, ARC, CIRCLE, ELLIPSE, POLYLINE, SPLINE 등의 DXF Entity를
+    /// 연속된 DxfPathPoint 목록으로 변환합니다.
+    /// </summary>
     internal sealed class DxfGeometryConverter
     {
         private readonly DxfCoordinateTransformer _coordinateTransformer;

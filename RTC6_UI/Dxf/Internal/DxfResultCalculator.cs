@@ -5,6 +5,10 @@ using RTC6_UI.Dxf.Models;
 
 namespace RTC6_UI.Dxf.Internal
 {
+    /// <summary>
+    /// 최종 Contour와 이동 명령을 기준으로 경계 및 통계 정보를 계산합니다.
+    /// Contour 수, Point 수, Mark 거리, Jump 거리와 Entity 종류별 개수를 집계합니다.
+    /// </summary>
     internal sealed class DxfResultCalculator
     {
         public DxfPathBounds? CalculateBounds(

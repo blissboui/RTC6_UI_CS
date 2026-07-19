@@ -24,7 +24,6 @@ using System.Threading.Tasks;
 // 8. RTC6 List 작성용 Jump/Mark 중간 명령 자동 생성
 //
 // 중요:
-// - 이 클래스는 DXF를 읽어 "가공 경로 데이터"를 만드는 클래스입니다.
 // - 결과의 Commands는 mm 단위입니다.
 // - 실제 RTC6 정수 좌표 변환과 List 기록은 Rtc6Controller에서 담당하세요.
 // - 레이저 출력, 인터록, 레이저 파라미터는 이 클래스에서 제어하지 않습니다.
@@ -32,8 +31,12 @@ using System.Threading.Tasks;
 
 namespace RTC6_UI.Dxf
 {
+    /// <summary>
+    /// DXF 파일 로드 과정을 총괄하는 클래스입니다.
+    /// 파일 검증, Entity 추출, Contour 정리, 이동 명령 생성 및 통계 계산을 순서대로 수행합니다.
+    /// </summary>
     public sealed class DxfLoader
-    {
+    { 
         private readonly DxfEntityExtractor _entityExtractor;
         private readonly DxfContourProcessor _contourProcessor;
         private readonly DxfPathOptimizer _pathOptimizer;
@@ -103,7 +106,7 @@ namespace RTC6_UI.Dxf
 
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();   // 작업 취소 시 예외 발생
 
                 DxfVersion version = DxfDocument.CheckDxfFileVersion(filePath);
 

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace RTC6_UI.Dxf
 {
+    /// <summary>
+    /// DXF 로드 및 좌표 변환에 사용되는 설정값을 저장합니다.
+    /// 단위 변환, 배율, 회전, 반전, 오프셋, 곡선 정밀도 및 필터링 조건을 관리합니다.
+    /// </summary>
     public sealed class DxfLoadOptions
     {
         // DXF 원본 좌표를 mm로 변환하는 배율입니다.
@@ -29,12 +33,10 @@ namespace RTC6_UI.Dxf
         public int SplinePrecision { get; init; } = 128;
 
         // 연속 점을 같은 점으로 판단하는 허용 오차(mm)입니다.
-        public double WeldToleranceMillimeter { get; init; } =
-            0.0001;
+        public double WeldToleranceMillimeter { get; init; } = 0.0001;
 
         // 2D 가공으로 허용할 Z 높이 오차(mm)입니다.
-        public double ZToleranceMillimeter { get; init; } =
-            0.001;
+        public double ZToleranceMillimeter { get; init; } = 0.001;
 
         // true이면 Z 허용 오차를 넘는 도형을 오류로 처리합니다.
         public bool RejectNonPlanarEntities { get; init; } = true;

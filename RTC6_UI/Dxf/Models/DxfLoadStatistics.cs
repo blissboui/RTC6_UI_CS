@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace RTC6_UI.Dxf.Models
 {
+    /// <summary>
+    /// DXF 처리 과정에서 계산된 통계 정보를 저장합니다.
+    /// Entity, Contour, Point, Command 개수와 Mark 및 Jump 이동 거리를 포함합니다.
+    /// </summary>
     public sealed class DxfLoadStatistics
     {
         public int TotalEntityCount { get; internal set; }

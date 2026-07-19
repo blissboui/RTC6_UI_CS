@@ -3,6 +3,10 @@ using System.IO;
 
 namespace RTC6_UI.Dxf.Internal
 {
+    /// <summary>
+    /// DXF 파일 경로와 로드 옵션의 유효성을 검사합니다.
+    /// 존재하지 않는 파일, 잘못된 확장자, 비정상적인 수치 설정 등을 확인합니다.
+    /// </summary>
     internal static class DxfValidator
     {
         public static bool ValidateFilePath(

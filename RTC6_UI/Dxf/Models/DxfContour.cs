@@ -36,8 +36,7 @@ namespace RTC6_UI.Dxf.Models
 
                 for (int index = 1; index < Points.Count; index++)
                 {
-                    length += Points[index - 1]
-                        .DistanceTo(Points[index]);
+                    length += Points[index - 1].DistanceTo(Points[index]);
                 }
 
                 if (IsClosed)

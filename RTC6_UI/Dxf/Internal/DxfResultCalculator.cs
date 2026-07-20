@@ -11,8 +11,7 @@ namespace RTC6_UI.Dxf.Internal
     /// </summary>
     internal sealed class DxfResultCalculator
     {
-        public DxfPathBounds? CalculateBounds(
-            IReadOnlyList<DxfContour> contours)
+        public DxfPathBounds? CalculateBounds(IReadOnlyList<DxfContour> contours)
         {
             if (contours.Count == 0)
             {
@@ -45,37 +44,26 @@ namespace RTC6_UI.Dxf.Internal
 
         public void FillFinalStatistics(DxfLoadResult result)
         {
-            result.Statistics.ContourCount =
-                result.Contours.Count;
+            result.Statistics.ContourCount = result.Contours.Count;
 
-            result.Statistics.PointCount =
-                result.Contours.Sum(
-                    contour => contour.Points.Count
-                );
+            result.Statistics.PointCount = result.Contours.Sum(contour => contour.Points.Count);    // (람다식) Contour 전체 포인트 개수
 
-            result.Statistics.TotalMarkLengthMillimeter =
-                result.Contours.Sum(
-                    contour => contour.MarkLength
-                );
+            result.Statistics.TotalMarkLengthMillimeter = result.Contours.Sum(contour => contour.MarkLength);   // 전체 mark 길이
 
             double jumpLength = 0.0;
             DxfPathPoint current = new(0.0, 0.0);
 
             foreach (DxfContour contour in result.Contours)
             {
-                jumpLength +=
-                    current.DistanceTo(contour.StartPoint);
+                jumpLength += current.DistanceTo(contour.StartPoint);
 
                 current = contour.EndPoint;
             }
 
-            result.Statistics.EstimatedJumpLengthMillimeter =
-                jumpLength;
+            result.Statistics.EstimatedJumpLengthMillimeter = jumpLength;
         }
 
-        public void CountEntity(
-            Dictionary<string, int> dictionary,
-            string key)
+        public void CountEntity(Dictionary<string, int> dictionary, string key)
         {
             if (dictionary.TryGetValue(key, out int count))
             {

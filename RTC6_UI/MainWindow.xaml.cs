@@ -40,7 +40,7 @@ public partial class MainWindow : Window
 
         if (dialog.ShowDialog() != true) return;
 
-        _dxfLoadCts?.Cancel();  // ?. : Null이 아닐 시 호출
+        _dxfLoadCts?.Cancel();  // ? : Null이 아닐 시 호출
         _dxfLoadCts?.Dispose();
         _dxfLoadCts = new CancellationTokenSource();
 

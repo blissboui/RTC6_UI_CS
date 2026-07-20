@@ -102,11 +102,9 @@ namespace RTC6_UI.Services
             }
 
             // PCIe용 RTC6 프로그램 파일 확인
-            string rtc6DatPath =
-                Path.Combine(programFolderPath, "RTC6DAT.dat");
+            string rtc6DatPath = Path.Combine(programFolderPath, "RTC6DAT.dat");
 
-            string rtc6OutPath =
-                Path.Combine(programFolderPath, "RTC6OUT.out");
+            string rtc6OutPath = Path.Combine(programFolderPath, "RTC6OUT.out");
 
             if (!File.Exists(rtc6DatPath))
             {
@@ -150,8 +148,7 @@ namespace RTC6_UI.Services
                 // 초기화 결과 코드로 처리합니다.
                 // ------------------------------------------------
 
-                uint initResult =
-                    RTC6Wrap.init_rtc6_dll();
+                uint initResult = RTC6Wrap.init_rtc6_dll();
 
                 // DLL 초기화 함수를 호출했으므로
                 // 종료 시 free_rtc6_dll()을 실행할 수 있게 표시
@@ -172,8 +169,7 @@ namespace RTC6_UI.Services
                 // 4. 연결된 RTC6 보드 개수 확인
                 // ------------------------------------------------
 
-                uint boardCount =
-                    RTC6Wrap.rtc6_count_cards();
+                uint boardCount = RTC6Wrap.rtc6_count_cards();
 
                 if (boardCount == 0)
                 {
@@ -190,8 +186,7 @@ namespace RTC6_UI.Services
                 // 5. 사용할 보드 번호 검사
                 // ------------------------------------------------
 
-                if (boardNumber < 1 ||
-                    boardNumber > boardCount)
+                if (boardNumber < 1 || boardNumber > boardCount)
                 {
                     LastError =
                         "RTC6 보드 번호가 잘못되었습니다.\n" +
@@ -215,8 +210,7 @@ namespace RTC6_UI.Services
                 // 파일들이 들어 있는 폴더를 전달합니다.
                 // ------------------------------------------------
 
-                uint programResult =
-                    RTC6Wrap.load_program_file(programFolderPath);
+                uint programResult = RTC6Wrap.load_program_file(programFolderPath);
 
                 if (programResult != 0)
                 {

@@ -48,9 +48,7 @@ namespace RTC6_UI.Dxf.Internal
 
             DxfExtractionContext context = new(options, result);
 
-            for (int index = 0;
-                 index < entities.Count;
-                 index++)
+            for (int index = 0; index < entities.Count; index++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -72,8 +70,7 @@ namespace RTC6_UI.Dxf.Internal
                     cancellationToken
                 );
 
-                if (context.TotalPointCount >
-                    options.MaximumPointCount)
+                if (context.TotalPointCount > options.MaximumPointCount)
                 {
                     throw new InvalidDataException(
                         "DXF 변환 점 개수가 제한을 초과했습니다.\n" +
@@ -85,7 +82,16 @@ namespace RTC6_UI.Dxf.Internal
 
             return context;
         }
-
+        /// <summary>
+        /// DXF Entity 하나를 검사하고 Entity 종류에 맞는 변환 처리를 수행합니다.
+        /// 가시성, 레이어, 지원 여부를 확인한 뒤 LINE, ARC, CIRCLE, ELLIPSE,
+        /// POLYLINE, SPLINE, INSERT 등을 DxfContour로 변환합니다.
+        /// </summary>
+        /// <param name="entity">현재 처리할 DXF Entity입니다.</param>
+        /// <param name="context">
+        /// 로드 옵션, 처리 결과, 생성된 Contour 및 통계 정보를 공유하는 작업 컨텍스트입니다.
+        /// </param>
+        /// <param name="cancellationToken">Entity 처리 취소 요청을 확인하는 토큰입니다.</param>
         private void ProcessEntity(
             EntityObject entity,
             string? inheritedLayerName,
@@ -285,13 +291,21 @@ namespace RTC6_UI.Dxf.Internal
 
             return true;
         }
-
+        /// <summary>
+        /// 현재 Entity가 사용할 실제 레이어 이름을 결정합니다.
+        /// 일반 Entity는 자신의 레이어를 사용하며, Block 내부의 Layer 0 Entity는
+        /// 해당 Block을 참조한 Insert의 레이어 이름을 상속합니다.
+        /// </summary>
+        /// <param name="entity">레이어를 확인할 현재 DXF Entity입니다.</param>
+        /// <param name="inheritedLayerName">
+        /// Block 내부 Entity가 Layer 0일 때 상속할 Insert의 레이어 이름입니다.
+        /// </param>
+        /// <returns>필터링과 Contour 생성에 사용할 최종 레이어 이름입니다.</returns>
         private static string ResolveLayerName(
             EntityObject entity,
             string? inheritedLayerName)
         {
-            string entityLayer =
-                entity.Layer?.Name ?? "0";
+            string entityLayer = entity.Layer?.Name ?? "0";
 
             // Block 내부의 Layer 0은 Insert가 놓인 Layer를 상속합니다.
             if (entityLayer.Equals(

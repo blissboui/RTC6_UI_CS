@@ -9,6 +9,12 @@ namespace RTC6_UI.Dxf.Internal
     /// </summary>
     internal static class DxfValidator
     {
+        /// <summary>
+        /// 파일 경로 유효성 검사
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="error"></param>
+        /// <returns></returns>
         public static bool ValidateFilePath(
             string filePath,
             out string error)
@@ -37,10 +43,13 @@ namespace RTC6_UI.Dxf.Internal
             error = string.Empty;
             return true;
         }
-
-        public static bool ValidateOptions(
-            DxfLoadOptions options,
-            out string error)
+        /// <summary>
+        /// 옵션 유효성 검사
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="error"></param>
+        /// <returns></returns>
+        public static bool ValidateOptions(DxfLoadOptions options, out string error)
         {
             if (!IsFinite(options.SourceUnitToMillimeter) ||
                 options.SourceUnitToMillimeter <= 0.0)

@@ -46,9 +46,16 @@
                 <Button x:Name="ShutdownButton"
                         Width="100"
                         Height="35"
+                        Margin="0,0,10,0"
                         Content="연결 종료"
                         Click="ShutdownButton_Click"/>
-
+                
+                <Button x:Name="OpenSystemSettingsButton"
+                        Width="100"
+                        Height="35"
+                        Content="시스템 설정"
+                        Click="OpenSystemSettingsButton_Click"/>
+                
                 <CheckBox x:Name="SimulationCheckBox"
                           Margin="20,0,0,0"
                           Content="시뮬레이션 모드"

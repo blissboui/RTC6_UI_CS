@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
-using RTC6_UI.Dxf;
-using RTC6_UI.Dxf.Models;
+using RTC6_UI.Rtc6sdk.Dxf;
+using RTC6_UI.Rtc6sdk.Dxf.Models;
 using RTC6_UI.Services;
+using RTC6_UI.Settings;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -20,15 +22,42 @@ public partial class MainWindow : Window
     private readonly Rtc6Controller _rtc6 = new();
     private readonly DxfLoader _dxfLoader = new();
 
+    private SystemSettings _systemSettings = new();
+    private readonly SystemSettingsService _systemSettingsService = new();
+
     private CancellationTokenSource? _dxfLoadCts;
     private DxfLoadResult? _loadedDxf;
 
     public MainWindow()
     {
         InitializeComponent();
+        LoadSystemSettings();
         Closing += MainWindow_Closing;
     }
 
+    /// <summary>
+    /// 시스템 설정창을 열고 사용자가 확인한 설정값을 저장합니다.
+    /// </summary>
+    private void OpenSystemSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        SystemSettingsWindow window = new(_systemSettings)
+        {
+            Owner = this
+        };
+
+        if (window.ShowDialog() != true || window.ResultSettings is null)
+            return;
+
+        _systemSettings = window.ResultSettings;
+
+        if (!_systemSettingsService.Save(_systemSettings))
+        {
+            MessageBox.Show(_systemSettingsService.LastError);
+            return;
+        }
+
+        MessageBox.Show("시스템 설정이 저장되었습니다.");
+    }
     private async void OpenDxfButton_Click(object sender, RoutedEventArgs e)
     {
         OpenFileDialog dialog = new()
@@ -187,14 +216,24 @@ public partial class MainWindow : Window
 
     private void InitializeButton_Click(object sender, RoutedEventArgs e)
     {
-        string programFolderPath = @"C:\Users\boboy\Desktop\RTC6-1.24.0\RTC6 Files\Program Files";
+        if (!_systemSettingsService.TryResolveRtc6Paths(
+            _systemSettings,
+            out string rtc6FolderPath,
+            out string correctionFilePath))
+        {
+            MessageBox.Show(
+                _systemSettingsService.LastError,
+                "RTC6 파일 오류",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
 
-        string correctionFilePath = @"C:\Users\boboy\Desktop\RTC6-1.24.0\Correction Files\실제파일명.ct5";
+            return;
+        }
 
         bool success = _rtc6.Initialize(
-            boardNumber: 1,
-            programFolderPath: programFolderPath,
-            correctionFilePath: correctionFilePath,
+            _systemSettings.BoardNumber,
+            rtc6FolderPath,
+            correctionFilePath,
             simulationMode: SimulationCheckBox.IsChecked == true);
 
         if (!success)
@@ -213,6 +252,23 @@ public partial class MainWindow : Window
             ? "RTC6 시뮬레이션 모드 초기화 완료"
             : "RTC6 실제 장비 초기화 완료");
     }
+    
+    private void LoadSystemSettings()
+{
+        if (_systemSettingsService.Load(out SystemSettings loadedSettings))
+        {
+            _systemSettings = loadedSettings;
+            return;
+        }
+
+        MessageBox.Show(
+        _systemSettingsService.LastError,
+        "설정 불러오기 오류",
+        MessageBoxButton.OK,
+        MessageBoxImage.Error);
+
+    InitializeButton.IsEnabled = false;
+}
 
     private void MoveButton_Click(object sender, RoutedEventArgs e)
     {

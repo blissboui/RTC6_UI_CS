@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RTC6_UI.Dxf.Models
+namespace RTC6_UI.Rtc6sdk.Dxf.Models
 {
     /// <summary>
     /// 단위, 배율, 반전, 회전 및 오프셋이 적용된 mm 단위의 2차원 좌표를 나타냅니다.

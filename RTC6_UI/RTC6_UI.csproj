@@ -10,6 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Correction Files\**" />
+    <Compile Remove="Program Files\**" />
+    <EmbeddedResource Remove="Correction Files\**" />
+    <EmbeddedResource Remove="Program Files\**" />
+    <None Remove="Correction Files\**" />
+    <None Remove="Program Files\**" />
+    <Page Remove="Correction Files\**" />
+    <Page Remove="Program Files\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="netDxf" Version="2023.11.10" />
   </ItemGroup>
 

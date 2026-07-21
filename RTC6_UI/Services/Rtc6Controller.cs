@@ -9,7 +9,6 @@
 // ============================================================
 
 using System;
-using System.IO;
 using RTC6Import;
 
 namespace RTC6_UI.Services
@@ -83,59 +82,16 @@ namespace RTC6_UI.Services
             }
 
             // ------------------------------------------------
-            // 2. 실제 모드에서 로컬 파일 확인
+            // 2. 최소한의 입력값 검사
+            //
+            // 폴더와 파일의 실제 존재 여부는 Initialize 호출 전에
+            // Rtc6FileValidator에서 검사합니다.
             // ------------------------------------------------
 
-            if (string.IsNullOrWhiteSpace(programFolderPath))
+            if (string.IsNullOrWhiteSpace(programFolderPath) ||
+                string.IsNullOrWhiteSpace(correctionFilePath))
             {
-                LastError = "RTC6 프로그램 폴더 경로가 비어 있습니다.";
-                return false;
-            }
-
-            if (!Directory.Exists(programFolderPath))
-            {
-                LastError =
-                    "RTC6 프로그램 폴더를 찾지 못했습니다.\n" +
-                    programFolderPath;
-
-                return false;
-            }
-
-            // PCIe용 RTC6 프로그램 파일 확인
-            string rtc6DatPath = Path.Combine(programFolderPath, "RTC6DAT.dat");
-
-            string rtc6OutPath = Path.Combine(programFolderPath, "RTC6OUT.out");
-
-            if (!File.Exists(rtc6DatPath))
-            {
-                LastError =
-                    "RTC6DAT.dat 파일을 찾지 못했습니다.\n" +
-                    rtc6DatPath;
-
-                return false;
-            }
-
-            if (!File.Exists(rtc6OutPath))
-            {
-                LastError =
-                    "RTC6OUT.out 파일을 찾지 못했습니다.\n" +
-                    rtc6OutPath;
-
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(correctionFilePath))
-            {
-                LastError = "Correction 파일 경로가 비어 있습니다.";
-                return false;
-            }
-
-            if (!File.Exists(correctionFilePath))
-            {
-                LastError =
-                    "Correction 파일을 찾지 못했습니다.\n" +
-                    correctionFilePath;
-
+                LastError = "RTC6 초기화에 필요한 파일 경로가 비어 있습니다.";
                 return false;
             }
 
@@ -143,15 +99,12 @@ namespace RTC6_UI.Services
             {
                 // ------------------------------------------------
                 // 3. RTC6 DLL 초기화
-                //
-                // init_rtc6_dll() 반환값은 보드 개수가 아니라
-                // 초기화 결과 코드로 처리합니다.
                 // ------------------------------------------------
 
                 uint initResult = RTC6Wrap.init_rtc6_dll();
 
                 // DLL 초기화 함수를 호출했으므로
-                // 종료 시 free_rtc6_dll()을 실행할 수 있게 표시
+                // 종료할 때 free_rtc6_dll()을 실행하도록 표시합니다.
                 _dllOpened = true;
 
                 if (initResult != 0)
@@ -159,7 +112,7 @@ namespace RTC6_UI.Services
                     LastError =
                         "RTC6 DLL 초기화에 실패했습니다.\n" +
                         $"반환 코드: {initResult}\n\n" +
-                        "보드 연결, RTC6 드라이버 설치 상태를 확인하세요.";
+                        "보드 연결과 RTC6 드라이버 설치 상태를 확인하세요.";
 
                     Shutdown();
                     return false;
@@ -206,11 +159,12 @@ namespace RTC6_UI.Services
                 // ------------------------------------------------
                 // 7. RTC6 시스템 프로그램 로드
                 //
-                // RTC6OUT.out 파일 자체가 아니라
-                // 파일들이 들어 있는 폴더를 전달합니다.
+                // RTC6DAT.dat와 RTC6OUT.out 파일이 들어 있는
+                // 폴더 경로를 전달합니다.
                 // ------------------------------------------------
 
-                uint programResult = RTC6Wrap.load_program_file(programFolderPath);
+                uint programResult =
+                    RTC6Wrap.load_program_file(programFolderPath);
 
                 if (programResult != 0)
                 {
@@ -236,8 +190,7 @@ namespace RTC6_UI.Services
                     RTC6Wrap.load_correction_file(
                         correctionFilePath,
                         1,
-                        2
-                    );
+                        2);
 
                 if (correctionResult != 0)
                 {
@@ -263,10 +216,8 @@ namespace RTC6_UI.Services
                 Exception rootException = exception;
 
                 // 가장 안쪽의 실제 오류를 찾습니다.
-                while (rootException.InnerException != null)
-                {
+                while (rootException.InnerException is not null)
                     rootException = rootException.InnerException;
-                }
 
                 LastError =
                     "RTC6 초기화 중 예외가 발생했습니다.\n\n" +
@@ -312,21 +263,39 @@ namespace RTC6_UI.Services
 
             try
             {
-                // List 1 작성 시작
+                //// List 1 작성 시작
+                //RTC6Wrap.set_start_list(1);
+
+                //// Jump 이동 속도 설정
+                //RTC6Wrap.set_jump_speed(speed);
+                //RTC6Wrap.set_mark_speed(speed);
+
+
+                //// 지정한 절대 좌표로 이동
+                ////RTC6Wrap.jump_abs(x, y);
+                //RTC6Wrap.mark_abs(x, y);
+
+                //// List 작성 종료
+                //RTC6Wrap.set_end_of_list();
+
+                //// List 1 실행
+                //RTC6Wrap.execute_list(1);
+
+
                 RTC6Wrap.set_start_list(1);
 
-                // Jump 이동 속도 설정
                 RTC6Wrap.set_jump_speed(speed);
 
-                // 지정한 절대 좌표로 이동
-                RTC6Wrap.jump_abs(x, y);
+                RTC6Wrap.jump_abs(-x, 0);
+                RTC6Wrap.long_delay(50000);
 
-                // List 작성 종료
+                RTC6Wrap.jump_abs(x, 0);
+                RTC6Wrap.long_delay(50000);
+                RTC6Wrap.list_repeat();
+
+
                 RTC6Wrap.set_end_of_list();
-
-                // List 1 실행
                 RTC6Wrap.execute_list(1);
-
                 return true;
             }
             catch (Exception exception)

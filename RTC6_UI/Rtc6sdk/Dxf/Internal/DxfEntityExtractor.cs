@@ -5,9 +5,10 @@ using System.Linq;
 using System.Threading;
 using netDxf;
 using netDxf.Entities;
-using RTC6_UI.Dxf.Models;
+using RTC6_UI.Rtc6sdk.Dxf;
+using RTC6_UI.Rtc6sdk.Dxf.Models;
 
-namespace RTC6_UI.Dxf.Internal
+namespace RTC6_UI.Rtc6sdk.Dxf.Internal
 {
     /// <summary>
     /// DXF 문서의 Entity를 순회하고 종류에 맞는 변환 처리를 호출합니다.

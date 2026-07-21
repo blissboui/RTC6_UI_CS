@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RTC6_UI.Dxf
+namespace RTC6_UI.Rtc6sdk.Dxf
 {
     /// <summary>
     /// DXF 로드 및 좌표 변환에 사용되는 설정값을 저장합니다.

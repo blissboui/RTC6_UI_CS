@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RTC6_UI.Dxf.Models
+namespace RTC6_UI.Rtc6sdk.Dxf.Models
 {
     /// <summary>
     /// DXF 처리 과정에서 계산된 통계 정보를 저장합니다.

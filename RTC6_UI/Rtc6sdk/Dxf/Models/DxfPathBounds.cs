@@ -1,5 +1,4 @@
-﻿
-namespace RTC6_UI.Dxf.Models
+﻿namespace RTC6_UI.Rtc6sdk.Dxf.Models
 {
     /// <summary>
     /// 변환된 DXF 도형 전체의 최소·최대 좌표와 가로·세로 크기를 저장합니다.

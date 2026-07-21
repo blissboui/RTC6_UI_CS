@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RTC6_UI.Dxf.Models
+namespace RTC6_UI.Rtc6sdk.Dxf.Models
 {
     /// <summary>
     /// 서로 연속해서 연결된 하나의 DXF 경로를 나타냅니다.

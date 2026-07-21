@@ -1,5 +1,4 @@
-﻿
-namespace RTC6_UI.Dxf
+﻿namespace RTC6_UI.Rtc6sdk.Dxf
 {
     /// <summary>
     /// DXF 경로를 RTC6 이동 명령으로 변환할 때 사용하는 명령 종류입니다.

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf.Models;
 
-namespace RTC6_UI.Rtc6sdk.Dxf.Internal
+namespace RTC6_UI.Dxf.Internal
 {
     /// <summary>
     /// Contour 사이의 불필요한 Jump 이동 거리를 줄이도록 실행 순서를 정렬합니다.

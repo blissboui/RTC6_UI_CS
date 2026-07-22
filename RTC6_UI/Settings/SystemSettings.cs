@@ -45,15 +45,16 @@ namespace RTC6_UI.Settings
 
     /// <summary>
     /// RTC6에서 사용하는 레이저 제어 모드 이름을 나타냅니다.
-    /// 실제 숫자값은 장비의 RTC6 레이저 정의와 일치시켜야 합니다.
     /// </summary>
     public enum LaserMode
     {
-        Co2Gate,
-        Yag1,
-        Yag2,
-        Yag3,
-        Yag4
+        Co2Gate = 0,
+        Yag1 = 1,
+        Yag2 = 2,
+        Yag3 = 3,
+        Laser4 = 4,
+        Yag5 = 5,
+        Laser6 = 6
     }
 
     /// <summary>
@@ -426,7 +427,6 @@ namespace RTC6_UI.Settings
 
         /// <summary>
         /// 장비의 RTC6 레이저 제어 모드입니다.
-        /// 화면 예시에 맞춰 YAG3를 기본값으로 설정했습니다.
         /// </summary>
         public LaserMode LaserMode
         {

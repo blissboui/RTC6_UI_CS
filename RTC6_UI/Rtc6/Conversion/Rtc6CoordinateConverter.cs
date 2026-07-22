@@ -1,13 +1,8 @@
-﻿using System;
-using RTC6_UI.Settings;
+﻿using RTC6_UI.Settings;
+using RTC6_UI.Rtc6.Models;
 
-namespace RTC6_UI.Services
+namespace RTC6_UI.Rtc6.Conversion
 {
-    /// <summary>
-    /// RTC6 List에 전달할 정수 X/Y 좌표입니다.
-    /// </summary>
-    public readonly record struct Rtc6Point(int X, int Y);
-
     /// <summary>
     /// mm 단위 경로 좌표를 RTC6 정수 좌표로 변환합니다.
     /// 축 반전과 스캔 필드 범위 검사도 함께 수행합니다.

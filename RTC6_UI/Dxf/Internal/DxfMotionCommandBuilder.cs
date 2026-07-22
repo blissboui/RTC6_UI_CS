@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using RTC6_UI.Rtc6sdk.Dxf;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf;
+using RTC6_UI.Dxf.Models;
 
-namespace RTC6_UI.Rtc6sdk.Dxf.Internal
+namespace RTC6_UI.Dxf.Internal
 {
     /// <summary>
     /// 정리된 Contour를 mm 단위의 Jump 및 Mark 명령 목록으로 변환합니다.

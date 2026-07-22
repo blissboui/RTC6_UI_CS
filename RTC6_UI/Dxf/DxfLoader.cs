@@ -1,7 +1,7 @@
 ﻿using netDxf;
 using netDxf.Header;
-using RTC6_UI.Rtc6sdk.Dxf.Internal;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf.Internal;
+using RTC6_UI.Dxf.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 // - 레이저 출력, 인터록, 레이저 파라미터는 이 클래스에서 제어하지 않습니다.
 // ============================================================
 
-namespace RTC6_UI.Rtc6sdk.Dxf
+namespace RTC6_UI.Dxf
 {
     /// <summary>
     /// DXF 파일 로드 과정을 총괄하는 클래스입니다.

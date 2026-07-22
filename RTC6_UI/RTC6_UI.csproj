@@ -12,12 +12,16 @@
   <ItemGroup>
     <Compile Remove="Correction Files\**" />
     <Compile Remove="Program Files\**" />
+    <Compile Remove="RTC6Files\**" />
     <EmbeddedResource Remove="Correction Files\**" />
     <EmbeddedResource Remove="Program Files\**" />
+    <EmbeddedResource Remove="RTC6Files\**" />
     <None Remove="Correction Files\**" />
     <None Remove="Program Files\**" />
+    <None Remove="RTC6Files\**" />
     <Page Remove="Correction Files\**" />
     <Page Remove="Program Files\**" />
+    <Page Remove="RTC6Files\**" />
   </ItemGroup>
 
   <ItemGroup>

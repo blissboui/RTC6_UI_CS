@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using netDxf;
-using RTC6_UI.Rtc6sdk.Dxf;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf;
+using RTC6_UI.Dxf.Models;
 
-namespace RTC6_UI.Rtc6sdk.Dxf.Internal
+namespace RTC6_UI.Dxf.Internal
 {
     /// <summary>
     /// DXF 원본 3차원 좌표를 mm 단위의 2차원 좌표로 변환합니다.

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using RTC6_UI.Rtc6sdk.Dxf;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf;
+using RTC6_UI.Dxf.Models;
 
-namespace RTC6_UI.Rtc6sdk.Dxf.Internal
+namespace RTC6_UI.Dxf.Internal
 {
     /// <summary>
     /// DXF Entity 추출 과정에서 여러 처리 클래스가 공유하는 임시 작업 데이터를 저장합니다.

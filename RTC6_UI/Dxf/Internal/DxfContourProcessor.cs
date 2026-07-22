@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System;
-using RTC6_UI.Rtc6sdk.Dxf;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf;
+using RTC6_UI.Dxf.Models;
 
-namespace RTC6_UI.Rtc6sdk.Dxf.Internal
+namespace RTC6_UI.Dxf.Internal
 {
     /// <summary>
     /// 추출된 Contour를 최종 가공 가능한 형태로 정리합니다.

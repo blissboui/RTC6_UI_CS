@@ -1,42 +1,60 @@
 ﻿using Microsoft.Win32;
-using RTC6_UI.Rtc6sdk.Dxf;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf;
+using RTC6_UI.Dxf.Models;
 using RTC6_UI.Services;
 using RTC6_UI.Settings;
-using System;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Windows;
 
 // ============================================================
 // 파일: MainWindow.xaml.cs
-// 역할: RTC6 제어 및 DXF 로드 처리
+// 역할:
+// 1. 시스템 설정 파일 로드 및 설정창 관리
+// 2. RTC6 초기화, 이동, 정지 및 연결 종료
+// 3. DXF 파일 선택 및 비동기 로드
+// 4. DXF 로드 진행률과 결과 표시
+// 5. 프로그램 동작 로그 표시
 // ============================================================
 
 namespace RTC6_UI;
 
+/// <summary>
+/// 프로그램의 메인 화면을 관리합니다.
+/// 시스템 설정, RTC6 제어, DXF 파일 로드 및 로그 출력을 담당합니다.
+/// </summary>
 public partial class MainWindow : Window
 {
     private readonly Rtc6Controller _rtc6 = new();
+
     private readonly DxfLoader _dxfLoader = new();
 
     private SystemSettings _systemSettings = new();
+
     private readonly SystemSettingsService _systemSettingsService = new();
 
     private CancellationTokenSource? _dxfLoadCts;
+
     private DxfLoadResult? _loadedDxf;
 
+    private readonly Rtc6SystemSettingsApplier _rtc6SettingsApplier;
+
+    /// <summary>
+    /// 메인 화면을 초기화하고 시스템 설정을 불러옵니다.
+    /// 창이 종료될 때 RTC6 및 DXF 작업을 정리하도록 Closing 이벤트를 등록합니다.
+    /// </summary>
     public MainWindow()
     {
         InitializeComponent();
+
+        _rtc6SettingsApplier = new Rtc6SystemSettingsApplier(_rtc6);
+
         LoadSystemSettings();
         Closing += MainWindow_Closing;
     }
 
     /// <summary>
-    /// 시스템 설정창을 열고 사용자가 확인한 설정값을 저장합니다.
+    /// 시스템 설정창을 열고 사용자가 확인한 설정값을 system.json에 저장합니다.
+    /// 사용자가 취소하면 기존 설정값을 유지합니다.
     /// </summary>
     private void OpenSystemSettingsButton_Click(object sender, RoutedEventArgs e)
     {
@@ -58,6 +76,11 @@ public partial class MainWindow : Window
 
         MessageBox.Show("시스템 설정이 저장되었습니다.");
     }
+
+    /// <summary>
+    /// DXF 파일 선택창을 열고 선택한 파일을 비동기로 불러옵니다.
+    /// 로드 진행률, 결과, 생성된 명령 및 경고를 화면과 로그에 표시합니다.
+    /// </summary>
     private async void OpenDxfButton_Click(object sender, RoutedEventArgs e)
     {
         OpenFileDialog dialog = new()
@@ -67,9 +90,11 @@ public partial class MainWindow : Window
             Multiselect = false
         };
 
-        if (dialog.ShowDialog() != true) return;
+        if (dialog.ShowDialog() != true)
+            return;
 
-        _dxfLoadCts?.Cancel();  // ? : Null이 아닐 시 호출
+        // 기존 DXF 로드 작업이 실행 중이면 취소하고 자원을 해제합니다.
+        _dxfLoadCts?.Cancel();
         _dxfLoadCts?.Dispose();
         _dxfLoadCts = new CancellationTokenSource();
 
@@ -88,9 +113,7 @@ public partial class MainWindow : Window
 
             if (!result.Success)
             {
-                MessageBox.Show(result.ErrorMessage, "DXF 오류",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-
+                MessageBox.Show(result.ErrorMessage, "DXF 오류", MessageBoxButton.OK, MessageBoxImage.Error);
                 AddLog($"DXF 로드 실패: {result.ErrorMessage}");
                 return;
             }
@@ -115,9 +138,7 @@ public partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            MessageBox.Show(exception.Message, "DXF 예외",
-                MessageBoxButton.OK, MessageBoxImage.Error);
-
+            MessageBox.Show(exception.Message, "DXF 예외", MessageBoxButton.OK, MessageBoxImage.Error);
             AddLog($"DXF 예외: {exception.Message}");
         }
         finally
@@ -126,6 +147,10 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// DXF 파일을 읽고 좌표 및 경로를 변환할 때 사용할 기본 옵션을 생성합니다.
+    /// 단위, 스케일, 회전, 곡선 정밀도 및 경로 최적화 조건을 지정합니다.
+    /// </summary>
     private static DxfLoadOptions CreateDxfLoadOptions()
     {
         return new DxfLoadOptions
@@ -150,6 +175,10 @@ public partial class MainWindow : Window
         };
     }
 
+    /// <summary>
+    /// 새로운 DXF 파일을 불러오기 전에 이전 결과와 UI 상태를 초기화합니다.
+    /// DXF 로드 중 상태로 전환하고 파일 경로를 로그에 기록합니다.
+    /// </summary>
     private void PrepareDxfLoad(string filePath)
     {
         DxfPathTextBox.Text = filePath;
@@ -163,6 +192,9 @@ public partial class MainWindow : Window
         AddLog($"DXF 로드 시작: {filePath}");
     }
 
+    /// <summary>
+    /// DXF 로드 작업에서 전달된 진행 정보를 진행률 표시줄과 텍스트에 표시합니다.
+    /// </summary>
     private void UpdateDxfProgress(DxfLoadProgress progress)
     {
         DxfProgressBar.Value = progress.Total == 0
@@ -172,6 +204,9 @@ public partial class MainWindow : Window
         DxfProgressText.Text = $"{progress.Current} / {progress.Total} ({progress.EntityType})";
     }
 
+    /// <summary>
+    /// DXF 로드 결과의 버전, 단위, Entity 수, 경로 길이 및 좌표 범위를 화면에 표시합니다.
+    /// </summary>
     private void ShowDxfResult(DxfLoadResult result)
     {
         string boundsText = result.Bounds is DxfPathBounds bounds
@@ -191,6 +226,10 @@ public partial class MainWindow : Window
             boundsText;
     }
 
+    /// <summary>
+    /// DXF에서 생성된 Jump 및 Mark 명령을 DataGrid에 표시합니다.
+    /// 각 명령의 순번, 종류, 좌표 및 레이어 이름을 출력합니다.
+    /// </summary>
     private void ShowDxfCommands(DxfLoadResult result)
     {
         DxfCommandGrid.ItemsSource = result.Commands.Select((command, index) => new
@@ -203,17 +242,27 @@ public partial class MainWindow : Window
         }).ToList();
     }
 
+    /// <summary>
+    /// 현재 실행 중인 DXF 비동기 로드 작업에 취소를 요청합니다.
+    /// </summary>
     private void CancelDxfLoadButton_Click(object sender, RoutedEventArgs e)
     {
         _dxfLoadCts?.Cancel();
     }
 
+    /// <summary>
+    /// DXF 로드 상태에 따라 파일 열기 버튼과 취소 버튼의 활성 상태를 변경합니다.
+    /// </summary>
     private void SetDxfLoading(bool isLoading)
     {
         OpenDxfButton.IsEnabled = !isLoading;
         CancelDxfLoadButton.IsEnabled = isLoading;
     }
 
+    /// <summary>
+    /// 시스템 설정에 지정된 RTC6 폴더와 파일을 검사한 후 RTC6를 초기화합니다.
+    /// Simulation 체크 상태에 따라 실제 장비 모드 또는 시뮬레이션 모드로 실행합니다.
+    /// </summary>
     private void InitializeButton_Click(object sender, RoutedEventArgs e)
     {
         if (!_systemSettingsService.TryResolveRtc6Paths(
@@ -230,31 +279,43 @@ public partial class MainWindow : Window
             return;
         }
 
-        bool success = _rtc6.Initialize(
+        if (!_rtc6.Initialize(
             _systemSettings.BoardNumber,
             rtc6FolderPath,
             correctionFilePath,
-            simulationMode: SimulationCheckBox.IsChecked == true);
-
-        if (!success)
-        {
+            simulationMode: SimulationCheckBox.IsChecked == true))
+        { 
             StatusText.Text = "Error";
             AddLog(_rtc6.LastError);
 
-            MessageBox.Show(_rtc6.LastError, "RTC6 초기화 오류",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(_rtc6.LastError, "RTC6 초기화 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
 
+        // RTC6 초기화가 성공한 뒤 SystemSettings 값을 보드에 적용합니다.
+        if (!_rtc6SettingsApplier.Apply(_systemSettings))
+        {
+            AddLog(_rtc6SettingsApplier.LastError);
+
+            MessageBox.Show(_rtc6SettingsApplier.LastError, "RTC6 설정 적용 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            _rtc6.Shutdown();
             return;
         }
 
         StatusText.Text = _rtc6.IsSimulationMode ? "Simulation" : "Ready";
+
         AddLog(_rtc6.IsSimulationMode
             ? "RTC6 시뮬레이션 모드 초기화 완료"
             : "RTC6 실제 장비 초기화 완료");
     }
-    
+
+    /// <summary>
+    /// 프로그램 시작 시 system.json을 읽어 현재 시스템 설정값에 적용합니다.
+    /// 설정 파일을 읽지 못하면 오류를 표시하고 RTC6 초기화 버튼을 비활성화합니다.
+    /// </summary>
     private void LoadSystemSettings()
-{
+    {
         if (_systemSettingsService.Load(out SystemSettings loadedSettings))
         {
             _systemSettings = loadedSettings;
@@ -262,18 +323,21 @@ public partial class MainWindow : Window
         }
 
         MessageBox.Show(
-        _systemSettingsService.LastError,
-        "설정 불러오기 오류",
-        MessageBoxButton.OK,
-        MessageBoxImage.Error);
+            _systemSettingsService.LastError,
+            "설정 불러오기 오류",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
 
-    InitializeButton.IsEnabled = false;
-}
+        InitializeButton.IsEnabled = false;
+    }
 
+    /// <summary>
+    /// 화면에 입력된 X, Y 좌표와 지정된 속도로 RTC6 Jump 이동을 실행합니다.
+    /// 좌표 입력이 숫자가 아니거나 이동에 실패하면 오류를 표시합니다.
+    /// </summary>
     private void MoveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!int.TryParse(XTextBox.Text, out int x) ||
-            !int.TryParse(YTextBox.Text, out int y))
+        if (!int.TryParse(XTextBox.Text, out int x) || !int.TryParse(YTextBox.Text, out int y))
         {
             MessageBox.Show("X와 Y에 숫자를 입력하세요.");
             return;
@@ -291,6 +355,9 @@ public partial class MainWindow : Window
         MessageBox.Show(_rtc6.LastError);
     }
 
+    /// <summary>
+    /// RTC6에서 현재 실행 중인 List 및 스캐너 이동을 정지합니다.
+    /// </summary>
     private void StopButton_Click(object sender, RoutedEventArgs e)
     {
         if (_rtc6.Stop())
@@ -299,6 +366,9 @@ public partial class MainWindow : Window
             AddLog(_rtc6.LastError);
     }
 
+    /// <summary>
+    /// RTC6 실행을 정지하고 DLL 및 연결 상태를 해제합니다.
+    /// </summary>
     private void ShutdownButton_Click(object sender, RoutedEventArgs e)
     {
         _rtc6.Shutdown();
@@ -306,6 +376,9 @@ public partial class MainWindow : Window
         AddLog("RTC6 연결 종료");
     }
 
+    /// <summary>
+    /// 메인 창이 닫힐 때 실행 중인 DXF 작업을 취소하고 RTC6 자원을 해제합니다.
+    /// </summary>
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
         _dxfLoadCts?.Cancel();
@@ -313,6 +386,9 @@ public partial class MainWindow : Window
         _rtc6.Dispose();
     }
 
+    /// <summary>
+    /// 현재 시간을 포함한 메시지를 로그 TextBox에 추가하고 마지막 줄로 스크롤합니다.
+    /// </summary>
     private void AddLog(string message)
     {
         LogTextBox.AppendText($"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}");

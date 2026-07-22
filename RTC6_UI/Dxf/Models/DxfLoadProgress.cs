@@ -1,4 +1,4 @@
-﻿namespace RTC6_UI.Rtc6sdk.Dxf.Models
+﻿namespace RTC6_UI.Dxf.Models
 {
     /// <summary>
     /// DXF 로드 진행 상태를 화면에 전달하기 위한 데이터입니다.

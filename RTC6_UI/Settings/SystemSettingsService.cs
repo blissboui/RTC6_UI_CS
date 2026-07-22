@@ -3,9 +3,9 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using RTC6_UI.Settings;
+using RTC6_UI.Services;
 
-namespace RTC6_UI.Services
+namespace RTC6_UI.Settings
 {
     /// <summary>
     /// 시스템 설정을 system.json 파일에 저장하고 불러옵니다.

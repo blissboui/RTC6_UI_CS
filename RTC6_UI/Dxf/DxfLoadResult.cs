@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using netDxf.Header;
-using RTC6_UI.Rtc6sdk.Dxf.Models;
+using RTC6_UI.Dxf.Models;
 
-namespace RTC6_UI.Rtc6sdk.Dxf
+namespace RTC6_UI.Dxf
 {
     /// <summary>
     /// DXF 파일 처리 결과를 저장합니다.

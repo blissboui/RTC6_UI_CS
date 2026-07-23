@@ -22,8 +22,6 @@ namespace RTC6_UI.Dxf
 
         public List<DxfContour> Contours { get; internal set; } = new();
 
-        // RTC6 List 작성 전 단계의 Jump/Mark 명령입니다.
-        // 좌표 단위는 mm이며 RTC6 정수 좌표가 아닙니다.
         public List<DxfMotionCommand> Commands { get; internal set; } = new();
 
         public List<string> Warnings { get; } = new();

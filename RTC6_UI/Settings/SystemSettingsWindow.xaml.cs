@@ -24,14 +24,26 @@ namespace RTC6_UI
         public SystemSettings? ResultSettings { get; private set; }
 
         /// <summary>
+        /// 모델 파라미터 탭에서 편집 중인 모델 설정 복사본입니다.
+        /// </summary>
+        public ModelSettings EditingModelSettings { get; }
+
+        /// <summary>
+        /// 사용자가 확인한 최종 모델 설정입니다.
+        /// 취소한 경우 null입니다.
+        /// </summary>
+        public ModelSettings? ResultModelSettings { get; private set; }
+
+        /// <summary>
         /// 기존 설정값을 복사하여 설정창의 초기값으로 표시합니다.
         /// </summary>
-        public SystemSettingsWindow(SystemSettings currentSettings)
+        public SystemSettingsWindow(SystemSettings currentSettings, ModelSettings currentModelSettings)
         {
             InitializeComponent();
 
             EditingSettings = currentSettings.Clone();
             DataContext = EditingSettings;
+            EditingModelSettings = currentModelSettings.Clone();
 
             InitializeComboBoxes();
             UpdateDelayControlState();
@@ -64,7 +76,6 @@ namespace RTC6_UI
             EncoderPolarityComboBox.ItemsSource = Enum.GetValues<EncoderPolarity>();
             OperationModeComboBox.ItemsSource = Enum.GetValues<OperationMode>();
             LaserModeComboBox.ItemsSource = Enum.GetValues<LaserMode>();
-            PathModeComboBox.ItemsSource = Enum.GetValues<OtfPathMode>();
             MotionCompensationComboBox.ItemsSource = Enum.GetValues<MotionCompensationMode>();
             FlyActivationComboBox.ItemsSource = Enum.GetValues<FlyActivationMode>();
         }
@@ -87,6 +98,7 @@ namespace RTC6_UI
             }
 
             ResultSettings = EditingSettings.Clone();
+            ResultModelSettings = EditingModelSettings.Clone();
             DialogResult = true;
         }
 
@@ -96,6 +108,7 @@ namespace RTC6_UI
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             ResultSettings = null;
+            ResultModelSettings = null;
             DialogResult = false;
         }
 

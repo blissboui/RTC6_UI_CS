@@ -58,15 +58,6 @@ namespace RTC6_UI.Settings
     }
 
     /// <summary>
-    /// 반복 패턴 사이의 Jump 이동 순서를 결정하는 OTF 경로 모드입니다.
-    /// </summary>
-    public enum OtfPathMode
-    {
-        Standard,
-        FeedOptimized
-    }
-
-    /// <summary>
     /// 소재 이송에 따른 스캐너 위치 보정 방식을 나타냅니다.
     /// </summary>
     public enum MotionCompensationMode
@@ -108,17 +99,12 @@ namespace RTC6_UI.Settings
         private uint _accScalePercent = 100;
         private int _laserShiftOn64;
         private int _laserShiftOff64;
-        private OtfPathMode _pathMode = OtfPathMode.FeedOptimized;
-        private bool _allowStrokeReverse = true;
-        private bool _allowContinuousBoundaryMark;
         private bool _useFeedDirectionSkewCompensation;
         private double _feedDirectionSkewPercent;
 
-        private MotionCompensationMode _motionCompensation =
-            MotionCompensationMode.RtcFly;
+        private MotionCompensationMode _motionCompensation = MotionCompensationMode.RtcFly;
 
-        private FlyActivationMode _flyActivation =
-            FlyActivationMode.SetFlyAxis;
+        private FlyActivationMode _flyActivation = FlyActivationMode.SetFlyAxis;
 
         private double _flyScaleCorrectionPercent;
         private bool _invertFly;
@@ -312,33 +298,6 @@ namespace RTC6_UI.Settings
         {
             get => _laserShiftOff64;
             set => SetField(ref _laserShiftOff64, value);
-        }
-
-        /// <summary>
-        /// OTF 패턴 사이의 이동 경로 최적화 방식입니다.
-        /// </summary>
-        public OtfPathMode PathMode
-        {
-            get => _pathMode;
-            set => SetField(ref _pathMode, value);
-        }
-
-        /// <summary>
-        /// 교번 패턴에서 홀수 번째 경로를 반대 방향으로 실행할 수 있는지 나타냅니다.
-        /// </summary>
-        public bool AllowStrokeReverse
-        {
-            get => _allowStrokeReverse;
-            set => SetField(ref _allowStrokeReverse, value);
-        }
-
-        /// <summary>
-        /// 한 패턴의 마지막 Mark와 다음 패턴의 첫 Mark를 연속해서 연결할지 나타냅니다.
-        /// </summary>
-        public bool AllowContinuousBoundaryMark
-        {
-            get => _allowContinuousBoundaryMark;
-            set => SetField(ref _allowContinuousBoundaryMark, value);
         }
 
         /// <summary>

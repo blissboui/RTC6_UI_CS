@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using RTC6_UI.Dxf;
 using RTC6_UI.Dxf.Models;
+using RTC6_UI.Rtc6.Conversion;
+using RTC6_UI.Rtc6.Models;
 using RTC6_UI.Services;
 using RTC6_UI.Settings;
 using System.ComponentModel;
@@ -30,6 +32,8 @@ public partial class MainWindow : Window
 
     private SystemSettings _systemSettings = new();
 
+    private ModelSettings _modelSettings = new();
+
     private readonly SystemSettingsService _systemSettingsService = new();
 
     private CancellationTokenSource? _dxfLoadCts;
@@ -37,6 +41,8 @@ public partial class MainWindow : Window
     private DxfLoadResult? _loadedDxf;
 
     private readonly Rtc6SystemSettingsApplier _rtc6SettingsApplier;
+
+    private readonly Rtc6CommandStore _rtc6CommandStore = new();
 
     /// <summary>
     /// 메인 화면을 초기화하고 시스템 설정을 불러옵니다.
@@ -58,15 +64,16 @@ public partial class MainWindow : Window
     /// </summary>
     private void OpenSystemSettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        SystemSettingsWindow window = new(_systemSettings)
+        SystemSettingsWindow window = new(_systemSettings, _modelSettings)
         {
             Owner = this
         };
 
-        if (window.ShowDialog() != true || window.ResultSettings is null)
+        if (window.ShowDialog() != true || window.ResultSettings is null || window.ResultModelSettings is null) 
             return;
 
         _systemSettings = window.ResultSettings;
+        _modelSettings = window.ResultModelSettings;
 
         if (!_systemSettingsService.Save(_systemSettings))
         {
@@ -123,10 +130,18 @@ public partial class MainWindow : Window
             ShowDxfResult(result);
             ShowDxfCommands(result);
 
+            // Dxf -> Rtc6정수좌표 변환
+            if (!PrepareRtc6Commands())
+            {
+                DxfProgressText.Text = "RTC6 좌표 변환 실패";
+                return;
+            }
+
             DxfProgressBar.Value = 100;
             DxfProgressText.Text = "로드 완료";
 
             AddLog($"DXF 로드 완료: Contour {result.Contours.Count}개, Command {result.Commands.Count}개");
+            AddLog($"RTC6 이동 명령 {_rtc6CommandStore.Count}개 변환 완료");
 
             foreach (string warning in result.Warnings)
                 AddLog($"DXF 경고: {warning}");
@@ -240,6 +255,57 @@ public partial class MainWindow : Window
             command.Y,
             command.LayerName
         }).ToList();
+    }
+
+    /// <summary>
+    /// 현재 로드된 mm 단위 DXF 이동 명령을 중심 이동 후 RTC6 정수 좌표 명령으로 변환하고
+    /// 변환 결과를 Rtc6CommandStore에 저장합니다.
+    /// 변환 중 오류가 발생하면 기존 RTC6 명령 목록을 삭제합니다.
+    /// </summary>
+    private bool PrepareRtc6Commands()
+    {
+        if (_loadedDxf is null || !_loadedDxf.Success)
+        {
+            _rtc6CommandStore.Clear();
+            AddLog("RTC6 명령으로 변환할 DXF 데이터가 없습니다.");
+            return false;
+        }
+
+        if (_loadedDxf.Commands.Count == 0)
+        {
+            _rtc6CommandStore.Clear();
+            AddLog("RTC6 명령으로 변환할 DXF 이동 명령이 없습니다.");
+            return false;
+        }
+
+        try
+        {
+            Rtc6CommandBuilder commandBuild = new();
+
+            // Rtc6정수 좌표 생성
+            List<Rtc6MotionCommand> rtc6MotionCommands = commandBuild.BuildRtc6Commands(_loadedDxf.Commands, _systemSettings, _modelSettings);
+
+            // Rtc6정수 좌표 List 저장
+            _rtc6CommandStore.Replace(rtc6MotionCommands);
+
+            return true;
+        }
+        catch (Exception exception)
+        {
+            _rtc6CommandStore.Clear();
+
+            string message = "RTC6 이동 명령 변환 중 오류가 발생했습니다.\n" + $"내용: {exception.Message}";
+
+            AddLog(message);
+
+            MessageBox.Show(
+                message,
+                "RTC6 좌표 변환 오류",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            return false;
+        }
     }
 
     /// <summary>

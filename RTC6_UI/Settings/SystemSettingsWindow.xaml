@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:RTC6_UI.Controls"
         xmlns:converters="clr-namespace:RTC6_UI.Converters"
+        xmlns:settings="clr-namespace:RTC6_UI.Settings"
         Title="설정"
         Width="650"
-        Height="820"
+        Height="850"
         MinWidth="620"
         MinHeight="600"
         FontFamily="맑은 고딕"
@@ -128,7 +129,7 @@
                                         Style="{StaticResource RoundButton}"
                                         Background="White"
                                         Click="BrowseProgramFolderButton_Click" />
-                                
+
                             </StackPanel>
 
                             <TextBlock Grid.Row="2" Text="보정 파일명:" Style="{StaticResource LabelStyle}" Grid.ColumnSpan="2" Margin="3,0,12,0" />
@@ -143,7 +144,7 @@
                             <TextBlock Grid.Row="4" Text="필드 크기 [mm]:" Style="{StaticResource LabelStyle}" Grid.ColumnSpan="2" Margin="3,0,12,0" />
                             <controls:NumericUpDown Grid.Row="4" Grid.Column="2" Width="85" HorizontalAlignment="Left"
                                                     Value="{Binding FieldSizeMillimeter}" Minimum="1" Maximum="1000"
-                                                    Increment="0.1" DecimalPlaces="1" Margin="0,5,0,4" />
+                                                    Increment="1" DecimalPlaces="1" Margin="0,5,0,4" />
                         </Grid>
 
                         <StackPanel Margin="160,2,0,0" Orientation="Horizontal">
@@ -255,48 +256,33 @@
                                 <RowDefinition Height="29" />
                                 <RowDefinition Height="29" />
                                 <RowDefinition Height="29" />
-                                <RowDefinition Height="29" />
-                                <RowDefinition Height="29" />
-                                <RowDefinition Height="29" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="OTF 경로 모드:" Style="{StaticResource LabelStyle}" />
-                            <ComboBox x:Name="PathModeComboBox" Grid.Row="0" Grid.Column="1" Width="200
-                                      "
-                                      HorizontalAlignment="Left" SelectedItem="{Binding PathMode}" />
 
-                            <TextBlock Grid.Row="1" Text="Stroke reverse:" Style="{StaticResource LabelStyle}" />
-                            <CheckBox Grid.Row="1" Grid.Column="1" Content="역방향 경로 허용"
-                                      IsChecked="{Binding AllowStrokeReverse}" />
-
-                            <TextBlock Grid.Row="2" Text="경계 연속 Mark:" Style="{StaticResource LabelStyle}" />
-                            <CheckBox Grid.Row="2" Grid.Column="1" Content="패턴 경계 연속 Mark 허용"
-                                      IsChecked="{Binding AllowContinuousBoundaryMark}" />
-
-                            <TextBlock Grid.Row="3" Text="기울어짐 보정 사용:" Style="{StaticResource LabelStyle}" />
-                            <CheckBox Grid.Row="3" Grid.Column="1" Content="이송방향 선형 기울어짐 보정"
+                            <TextBlock Grid.Row="0" Text="기울어짐 보정 사용:" Style="{StaticResource LabelStyle}" />
+                            <CheckBox Grid.Row="0" Grid.Column="1" Content="이송방향 선형 기울어짐 보정"
                                       IsChecked="{Binding UseFeedDirectionSkewCompensation}" />
 
-                            <TextBlock Grid.Row="4" Text="기울어짐 보정 [%]:" Style="{StaticResource LabelStyle}" />
-                            <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Width="90" HorizontalAlignment="Left"
+                            <TextBlock Grid.Row="1" Text="기울어짐 보정 [%]:" Style="{StaticResource LabelStyle}" />
+                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Width="90" HorizontalAlignment="Left"
                                                     Value="{Binding FeedDirectionSkewPercent}"
                                                     Minimum="-100" Maximum="100"
                                                     Increment="0.001" DecimalPlaces="3" />
 
-                            <TextBlock Grid.Row="5" Text="OTF 보정 모드:" Style="{StaticResource LabelStyle}" />
-                            <ComboBox x:Name="MotionCompensationComboBox" Grid.Row="5" Grid.Column="1" Width="200"
+                            <TextBlock Grid.Row="2" Text="OTF 보정 모드:" Style="{StaticResource LabelStyle}" />
+                            <ComboBox x:Name="MotionCompensationComboBox" Grid.Row="2" Grid.Column="1" Width="200"
                                       HorizontalAlignment="Left" SelectedItem="{Binding MotionCompensation}" />
 
-                            <TextBlock Grid.Row="6" Text="RTC Fly API:" Style="{StaticResource LabelStyle}" />
-                            <ComboBox x:Name="FlyActivationComboBox" Grid.Row="6" Grid.Column="1" Width="200"
+                            <TextBlock Grid.Row="3" Text="RTC Fly API:" Style="{StaticResource LabelStyle}" />
+                            <ComboBox x:Name="FlyActivationComboBox" Grid.Row="3" Grid.Column="1" Width="200"
                                       HorizontalAlignment="Left" SelectedItem="{Binding FlyActivation}" />
 
-                            <TextBlock Grid.Row="7" Text="Fly 보정 방향:" Style="{StaticResource LabelStyle}" />
-                            <CheckBox Grid.Row="7" Grid.Column="1" Content="Fly 보정 방향 반전"
+                            <TextBlock Grid.Row="4" Text="Fly 보정 방향:" Style="{StaticResource LabelStyle}" />
+                            <CheckBox Grid.Row="4" Grid.Column="1" Content="Fly 보정 방향 반전"
                                       IsChecked="{Binding InvertFly}" />
 
-                            <TextBlock Grid.Row="8" Text="Fly 스케일 보정 [%]:" Style="{StaticResource LabelStyle}" />
-                            <controls:NumericUpDown Grid.Row="8" Grid.Column="1" Width="90" HorizontalAlignment="Left"
+                            <TextBlock Grid.Row="5" Text="Fly 스케일 보정 [%]:" Style="{StaticResource LabelStyle}" />
+                            <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Width="90" HorizontalAlignment="Left"
                                                     Value="{Binding FlyScaleCorrectionPercent}"
                                                     Minimum="-99.999" Maximum="500"
                                                     Increment="0.001" DecimalPlaces="3" />
@@ -417,11 +403,188 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="모델 파라미터">
-                <Grid>
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                               Foreground="#777777" Text="모델 파라미터 화면 구현 영역" />
-                </Grid>
+            <TabItem Header="모델 파라미터"
+                     DataContext="{Binding EditingModelSettings, RelativeSource={RelativeSource AncestorType=Window}}" Height="25" Margin="-2,-2,-2,0" VerticalAlignment="Top">
+                <ScrollViewer Margin="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8,2,14,12">
+
+                        <!-- 속도 및 패턴 피치 -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+
+                                <ColumnDefinition Width="190"/>
+                                <ColumnDefinition Width="260" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="마킹 속도 [mm/s]:" Style="{StaticResource LabelStyle}" Grid.ColumnSpan="2" Margin="3,0,12,0" />
+                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Width="110" HorizontalAlignment="Left"
+                                                    Value="{Binding MarkingSpeedMillimeterPerSecond, Mode=TwoWay}"
+                                                    Minimum="1" Maximum="100000" Increment="10" DecimalPlaces="0" Margin="0,4,0,5" />
+
+                            <TextBlock Grid.Row="1" Text="점프 속도 [mm/s]:" Style="{StaticResource LabelStyle}" Grid.ColumnSpan="2" Margin="3,0,12,0" />
+                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Width="110" HorizontalAlignment="Left"
+                                                    Value="{Binding JumpSpeedMillimeterPerSecond, Mode=TwoWay}"
+                                                    Minimum="1" Maximum="100000" Increment="10" DecimalPlaces="0" Margin="0,5,0,4" />
+
+                            <TextBlock Grid.Row="2" Text="패턴 피치 [mm]:" Style="{StaticResource LabelStyle}" Grid.ColumnSpan="2" Margin="3,0,12,0" />
+                            <controls:NumericUpDown Grid.Row="2" Grid.Column="1"
+                                                    Value="{Binding PatternPitchMillimeter, Mode=TwoWay}"
+                                                    Minimum="0.001" Maximum="100000" Increment="0.1" DecimalPlaces="2" Margin="0,4,0,5" HorizontalAlignment="Left" Width="110" />
+                        </Grid>
+
+                        <!-- 롤 및 구간 길이 -->
+                        <TextBlock Text="── 롤 / 구간 길이 ──" Style="{StaticResource SectionTitleStyle}" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="190" />
+                                <ColumnDefinition Width="240" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="24" />
+                                <RowDefinition Height="24" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="롤 전체 길이 [mm]:" Style="{StaticResource LabelStyle}" Margin="3,0,12,0" Height="15" />
+                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1"
+                                                    Value="{Binding RollTotalLengthMillimeter, Mode=TwoWay}"
+                                                    Minimum="0" Maximum="10000000" Increment="1" DecimalPlaces="1" Margin="0,4,0,5" HorizontalAlignment="Left" Width="110" />
+
+                            <TextBlock Grid.Row="1" Text="앞 커팅 길이 [mm]:" Style="{StaticResource LabelStyle}" Margin="3,0,12,0" Height="15" />
+                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Width="109" HorizontalAlignment="Left"
+                                                    Value="{Binding FrontCutLengthMillimeter, Mode=TwoWay}"
+                                                    Minimum="0" Maximum="10000000" Increment="1" DecimalPlaces="1" Margin="0,5,0,4" />
+
+                            <TextBlock Grid.Row="2" Text="뒤 커팅 길이 [mm]:" Style="{StaticResource LabelStyle}" Margin="3,0,12,0" Height="15" />
+                            <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Width="109" HorizontalAlignment="Left"
+                                                    Value="{Binding RearCutLengthMillimeter, Mode=TwoWay}"
+                                                    Minimum="0" Maximum="10000000" Increment="1" DecimalPlaces="1" Margin="0,4,0,5" />
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="속도 검증" Margin="3,2,0,0" Foreground="#159447" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="패턴 구간: -" Margin="4,2,0,0" Foreground="#4A38B8" FontWeight="SemiBold" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="패턴 횟수: -" Margin="4,2,0,0" Foreground="#4A38B8" FontWeight="SemiBold" />
+                        </Grid>
+
+                        <!-- 커팅 위치 -->
+                        <TextBlock Text="── 커팅 위치 ──" Style="{StaticResource SectionTitleStyle}" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="190" />
+                                <ColumnDefinition Width="240" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="24" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="커팅 기준점:" Style="{StaticResource LabelStyle}" Margin="3,7,12,0" Height="15" VerticalAlignment="Top" />
+                            <ComboBox Grid.Column="1"
+                                      SelectedValuePath="Tag" SelectedValue="{Binding CuttingReference, Mode=TwoWay}" Height="21" VerticalAlignment="Center" HorizontalAlignment="Left" Width="230">
+                                <ComboBoxItem Content="바닥/좌측 (NegativeSide)" Tag="{x:Static settings:CuttingReferencePoint.NegativeSide}" />
+                                <ComboBoxItem Content="중심 (Center)" Tag="{x:Static settings:CuttingReferencePoint.Center}" />
+                                <ComboBoxItem Content="상단/우측 (PositiveSide)" Tag="{x:Static settings:CuttingReferencePoint.PositiveSide}" />
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="1" Text="커팅 라인 오프셋 [mm]:" Style="{StaticResource LabelStyle}" Margin="3,0,12,0" Height="15" />
+                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1"
+                                                    Value="{Binding CuttingLineOffsetMillimeter, Mode=TwoWay}"
+                                                    Minimum="-1000" Maximum="1000" Increment="0.1" DecimalPlaces="2" Margin="0,5,0,4" HorizontalAlignment="Left" Width="110" />
+
+                            <TextBlock Grid.Row="2" Text="파크 오프셋 [mm]:" Style="{StaticResource LabelStyle}" Margin="3,0,12,0" Height="15" />
+                            <controls:NumericUpDown Grid.Row="2" Grid.Column="1"
+                                                    Value="{Binding ParkOffsetMillimeter, Mode=TwoWay}"
+                                                    Minimum="-1000" Maximum="1000" Increment="0.1" DecimalPlaces="2" Margin="0,5,0,4" HorizontalAlignment="Left" Width="110" />
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="절대값: -" Margin="3,2,0,0" Foreground="#159447" FontWeight="SemiBold" />
+                        </Grid>
+
+                        <!-- 패턴 오프셋 -->
+                        <TextBlock Text="── 패턴 오프셋 ──" Style="{StaticResource SectionTitleStyle}" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="190" />
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="패턴 오프셋 X [mm]:" Style="{StaticResource LabelStyle}" />
+                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Width="110" HorizontalAlignment="Left"
+                                                    Value="{Binding PatternOffsetXMillimeter, Mode=TwoWay}"
+                                                    Minimum="-1000" Maximum="1000" Increment="1" DecimalPlaces="3" Margin="0,4,0,5" />
+
+                            <TextBlock Grid.Row="1" Text="패턴 오프셋 Y [mm]:" Style="{StaticResource LabelStyle}" />
+                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Width="110" HorizontalAlignment="Left"
+                                                    Value="{Binding PatternOffsetYMillimeter, Mode=TwoWay}"
+                                                    Minimum="-1000" Maximum="1000" Increment="1" DecimalPlaces="3" Margin="0,5,0,4" />
+
+                            <TextBlock Grid.Row="2" Text="도안 X 배율:" Style="{StaticResource LabelStyle}" />
+                            <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Width="90" HorizontalAlignment="Left"
+                                                    Value="{Binding PatternScaleX, Mode=TwoWay}"
+                                                    Minimum="0.001" Maximum="1000" Increment="0.001" DecimalPlaces="3" Margin="0,4,0,5" />
+
+                            <TextBlock Grid.Row="3" Text="도안 Y 배율:" Style="{StaticResource LabelStyle}" />
+                            <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Width="90" HorizontalAlignment="Left"
+                                                    Value="{Binding PatternScaleY, Mode=TwoWay}"
+                                                    Minimum="0.001" Maximum="1000" Increment="0.001" DecimalPlaces="3" Margin="0,5,0,4" />
+
+                            <TextBlock Grid.Row="4" Text="이송 속도 [mm/s]:" Style="{StaticResource LabelStyle}" />
+                            <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Width="90" HorizontalAlignment="Left"
+                                                    Value="{Binding MaterialFeedSpeedMillimeterPerSecond, Mode=TwoWay}"
+                                                    Minimum="0" Maximum="100000" Increment="10" DecimalPlaces="0" Margin="0,4,0,5" />
+                        </Grid>
+
+                        <!-- OTF 경로 설정 -->
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="190" />
+                                <ColumnDefinition Width="390" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35" />
+                                <RowDefinition Height="29" />
+                                <RowDefinition Height="29" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="OTF 경로 모드:" Style="{StaticResource LabelStyle}" />
+                            <ComboBox Grid.Row="0" Grid.Column="1"
+                                      SelectedValuePath="Tag" SelectedValue="{Binding PathMode, Mode=TwoWay}" Margin="0,7,0,7" HorizontalAlignment="Left" Width="230">
+                                <ComboBoxItem Content="Standard" Tag="{x:Static settings:OtfPathMode.Standard}" />
+                                <ComboBoxItem Content="FeedOptimized (고속 OTF 권장)" Tag="{x:Static settings:OtfPathMode.FeedOptimized}" />
+                            </ComboBox>
+
+                            <CheckBox Grid.Row="1" Grid.Column="1" Content="Stroke reverse 허용" IsChecked="{Binding AllowStrokeReverse, Mode=TwoWay}" />
+                            <CheckBox Grid.Row="2" Grid.Column="1" Content="패턴 경계 연속 mark 허용(향후 장비 검증 후 사용)"
+                                      IsChecked="{Binding AllowContinuousBoundaryMark, Mode=TwoWay}" />
+                        </Grid>
+
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
 
             <TabItem Header="TEST 모드">

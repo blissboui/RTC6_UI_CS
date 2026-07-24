@@ -36,9 +36,9 @@ namespace RTC6_UI.Rtc6.Conversion
             Rtc6PatternTransformer patternTransformer = new Rtc6PatternTransformer();
             List<DxfMotionCommand> patternCommands = patternTransformer.Transform(centeredCommands, modelSettings);
 
-            // 현재 시스템 설정을 사용하여 중심 이동된 mm 좌표를 RTC6 정수 좌표로 변환합니다.
+            // 현재 시스템 설정을 사용하여 중심 이동, 패턴 오프셋 적용된 mm 좌표를 RTC6 정수 좌표로 변환합니다.
             Rtc6CommandConverter commandConverter = new(settings);
-            List<Rtc6MotionCommand> convertedCommands = commandConverter.Convert(centeredCommands);
+            List<Rtc6MotionCommand> convertedCommands = commandConverter.Convert(patternCommands);
 
             return convertedCommands;
         }

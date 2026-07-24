@@ -91,7 +91,7 @@ namespace RTC6_UI.Services
         /// <summary>
         /// 현재 작성 중인 RTC6 List에 OTF Fly 설정을 추가합니다.
         ///
-        /// 반드시 set_start_list() 호출 후, 실제 Jump/Mark 명령을 추가하기 전에 호출해야 합니다.
+        /// 반드시 set_start_list(), load_list() 호출 후 실제 Jump/Mark 명령을 추가하기 전에 호출해야 합니다.
         /// set_fly_x와 set_fly_y는 Control 명령이 아니라 List 명령입니다.
         /// </summary>
         public bool AppendFlySettingsToCurrentList(SystemSettings settings)

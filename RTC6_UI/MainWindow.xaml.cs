@@ -44,6 +44,8 @@ public partial class MainWindow : Window
 
     private readonly Rtc6CommandStore _rtc6CommandStore = new();
 
+    private readonly Rtc6ListWriter _rtc6ListWriter;
+
     /// <summary>
     /// 메인 화면을 초기화하고 시스템 설정을 불러옵니다.
     /// 창이 종료될 때 RTC6 및 DXF 작업을 정리하도록 Closing 이벤트를 등록합니다.
@@ -53,6 +55,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         _rtc6SettingsApplier = new Rtc6SystemSettingsApplier(_rtc6);
+        _rtc6ListWriter = new Rtc6ListWriter(_rtc6, _rtc6SettingsApplier);
 
         LoadSystemSettings();
         Closing += MainWindow_Closing;
@@ -137,11 +140,20 @@ public partial class MainWindow : Window
                 return;
             }
 
+            if (!_rtc6ListWriter.WriteList(1, _rtc6CommandStore, _systemSettings, _modelSettings))
+            {
+                DxfProgressText.Text = "RTC6 List 작성 실패";
+                MessageBox.Show(_rtc6ListWriter.LastError, "List 작성 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                AddLog($"RTC6 List 작성 실패: {_rtc6ListWriter}");
+                return;
+            }
+
             DxfProgressBar.Value = 100;
             DxfProgressText.Text = "로드 완료";
 
             AddLog($"DXF 로드 완료: Contour {result.Contours.Count}개, Command {result.Commands.Count}개");
             AddLog($"RTC6 이동 명령 {_rtc6CommandStore.Count}개 변환 완료");
+            AddLog($"RTC6 LIST 작성 완료");
 
             foreach (string warning in result.Warnings)
                 AddLog($"DXF 경고: {warning}");
@@ -202,6 +214,7 @@ public partial class MainWindow : Window
         DxfResultText.Text = string.Empty;
         DxfCommandGrid.ItemsSource = null;
         _loadedDxf = null;
+        _rtc6CommandStore.Clear();
 
         SetDxfLoading(true);
         AddLog($"DXF 로드 시작: {filePath}");
@@ -331,10 +344,14 @@ public partial class MainWindow : Window
     /// </summary>
     private void InitializeButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!_systemSettingsService.TryResolveRtc6Paths(
+        bool simulationMode = SimulationCheckBox.IsChecked == true;
+        string rtc6FolderPath = string.Empty;
+        string correctionFilePath = string.Empty;
+
+        if (!simulationMode && !_systemSettingsService.TryResolveRtc6Paths(
             _systemSettings,
-            out string rtc6FolderPath,
-            out string correctionFilePath))
+            out rtc6FolderPath,
+            out correctionFilePath))
         {
             MessageBox.Show(
                 _systemSettingsService.LastError,
@@ -349,7 +366,7 @@ public partial class MainWindow : Window
             _systemSettings.BoardNumber,
             rtc6FolderPath,
             correctionFilePath,
-            simulationMode: SimulationCheckBox.IsChecked == true))
+            simulationMode))
         { 
             StatusText.Text = "Error";
             AddLog(_rtc6.LastError);
@@ -371,9 +388,7 @@ public partial class MainWindow : Window
 
         StatusText.Text = _rtc6.IsSimulationMode ? "Simulation" : "Ready";
 
-        AddLog(_rtc6.IsSimulationMode
-            ? "RTC6 시뮬레이션 모드 초기화 완료"
-            : "RTC6 실제 장비 초기화 완료");
+        AddLog(_rtc6.IsSimulationMode ? "RTC6 시뮬레이션 모드 초기화 완료" : "RTC6 실제 장비 초기화 완료");
     }
 
     /// <summary>
@@ -457,7 +472,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void AddLog(string message)
     {
-        LogTextBox.AppendText($"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}");
+        LogTextBox.AppendText($"[{DateTime.Now:HH:mm:ss.fff}] {message}{Environment.NewLine}");
         LogTextBox.ScrollToEnd();
     }
 }

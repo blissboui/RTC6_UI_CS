@@ -69,9 +69,9 @@
             <Setter Property="TextWrapping" Value="Wrap" />
         </Style>
 
-        <!-- 얇은 스크롤바 -->
+        <!-- 스크롤바 -->
         <Style TargetType="{x:Type ScrollBar}">
-            <Setter Property="Width" Value="8" />
+            <Setter Property="Width" Value="1" />
             <Setter Property="Background" Value="Transparent" />
             <Style.Triggers>
                 <Trigger Property="Orientation" Value="Horizontal">
@@ -90,7 +90,7 @@
         </Grid.RowDefinitions>
 
         <TabControl Grid.Row="0">
-            <TabItem Header="시스템 설정 (H/W)">
+            <TabItem Header="시스템 설정 (H/W)" FontSize="10" >
                 <ScrollViewer Margin="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="8,2,14,8">
 
@@ -178,7 +178,7 @@
                                       HorizontalAlignment="Left" SelectedItem="{Binding FeedDirection}" />
 
                             <TextBlock Grid.Row="2" Text="Fly 축 교환:" Style="{StaticResource LabelStyle}" />
-                            <CheckBox Grid.Row="2" Grid.Column="1" Content="FeedAxis ↔ set_fly_x/y 교환"
+                            <CheckBox Grid.Row="2" Grid.Column="1" Content="FeedAxis ↔ _set_fly_x/y"
                                       IsChecked="{Binding SwapFlyAxis}" />
 
                             <TextBlock Grid.Row="3" Text="엔코더 [pulses/mm]:" Style="{StaticResource LabelStyle}" />
@@ -404,9 +404,9 @@
             </TabItem>
 
             <TabItem Header="모델 파라미터"
-                     DataContext="{Binding EditingModelSettings, RelativeSource={RelativeSource AncestorType=Window}}" Height="25" Margin="-2,-2,-2,0" VerticalAlignment="Top">
+                     DataContext="{Binding EditingModelSettings, RelativeSource={RelativeSource AncestorType=Window}}" FontSize="10">
                 <ScrollViewer Margin="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8,2,14,12">
+                    <StackPanel Margin="8,2,14,8">
 
                         <!-- 속도 및 패턴 피치 -->
                         <Grid>
@@ -589,7 +589,7 @@
 
             <TabItem Header="TEST 모드">
                 <Grid>
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"
                                Foreground="#777777" Text="TEST 모드 화면 구현 영역" />
                 </Grid>
             </TabItem>

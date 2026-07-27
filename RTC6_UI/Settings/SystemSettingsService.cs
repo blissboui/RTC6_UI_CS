@@ -55,9 +55,7 @@ namespace RTC6_UI.Settings
                 if (!File.Exists(SettingsFilePath))
                     return Save(settings);
 
-                string json = File.ReadAllText(
-                    SettingsFilePath,
-                    Encoding.UTF8);
+                string json = File.ReadAllText(SettingsFilePath, Encoding.UTF8);
 
                 settings =
                     JsonSerializer.Deserialize<SystemSettings>(
@@ -65,13 +63,9 @@ namespace RTC6_UI.Settings
                         JsonOptions)
                     ?? new SystemSettings();
 
-                if (!SystemSettingsValidator.Validate(
-                        settings,
-                        out string validationError))
+                if (!SystemSettingsValidator.Validate(settings,  out string validationError))
                 {
-                    LastError =
-                        "시스템 설정값이 올바르지 않습니다.\n"
-                        + validationError;
+                    LastError = "시스템 설정값이 올바르지 않습니다.\n" + validationError;
 
                     return false;
                 }
@@ -80,9 +74,7 @@ namespace RTC6_UI.Settings
             }
             catch (Exception exception)
             {
-                LastError = BuildExceptionMessage(
-                    "시스템 설정을 불러오지 못했습니다.",
-                    exception);
+                LastError = BuildExceptionMessage("시스템 설정을 불러오지 못했습니다.", exception);
 
                 return false;
             }
@@ -101,13 +93,9 @@ namespace RTC6_UI.Settings
                 return false;
             }
 
-            if (!SystemSettingsValidator.Validate(
-                    settings,
-                    out string validationError))
+            if (!SystemSettingsValidator.Validate(settings, out string validationError))
             {
-                LastError =
-                    "시스템 설정값이 올바르지 않습니다.\n"
-                    + validationError;
+                LastError = "시스템 설정값이 올바르지 않습니다.\n" + validationError;
 
                 return false;
             }

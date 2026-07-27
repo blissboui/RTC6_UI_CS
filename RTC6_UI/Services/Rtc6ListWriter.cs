@@ -140,6 +140,14 @@ namespace RTC6_UI.Services
         }
 
         /// <summary>
+        /// 시스템 설정 변경, RTC6 재초기화 또는 새로운 DXF 로드 시 이전 List 작성 완료 정보를 무효화합니다.
+        /// </summary>
+        public void InvalidateWrittenList()
+        {
+            ResetResult();
+        }
+
+        /// <summary>
         /// 이전 RTC6 List 작성 결과와 오류 정보를 초기화합니다.
         /// </summary>
         private void ResetResult()

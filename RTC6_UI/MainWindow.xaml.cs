@@ -29,6 +29,7 @@ public partial class MainWindow : Window
     private readonly Rtc6Controller _rtc6 = new();
 
     private readonly DxfLoader _dxfLoader = new();
+    private CancellationTokenSource? _dxfLoadCts;
 
     private SystemSettings _systemSettings = new();
 
@@ -36,7 +37,6 @@ public partial class MainWindow : Window
 
     private readonly SystemSettingsService _systemSettingsService = new();
 
-    private CancellationTokenSource? _dxfLoadCts;
 
     private DxfLoadResult? _loadedDxf;
 
@@ -45,6 +45,9 @@ public partial class MainWindow : Window
     private readonly Rtc6CommandStore _rtc6CommandStore = new();
 
     private readonly Rtc6ListWriter _rtc6ListWriter;
+
+    private readonly Rtc6ListExecutor _rtc6ListExecutor;
+    private CancellationTokenSource? _rtc6ExecutionCts;
 
     /// <summary>
     /// 메인 화면을 초기화하고 시스템 설정을 불러옵니다.
@@ -56,6 +59,7 @@ public partial class MainWindow : Window
 
         _rtc6SettingsApplier = new Rtc6SystemSettingsApplier(_rtc6);
         _rtc6ListWriter = new Rtc6ListWriter(_rtc6, _rtc6SettingsApplier);
+        _rtc6ListExecutor = new Rtc6ListExecutor(_rtc6, _rtc6ListWriter);
 
         LoadSystemSettings();
         Closing += MainWindow_Closing;
@@ -77,6 +81,8 @@ public partial class MainWindow : Window
 
         _systemSettings = window.ResultSettings;
         _modelSettings = window.ResultModelSettings;
+        _rtc6ListWriter.InvalidateWrittenList();
+        StartListButton.IsEnabled = false;
 
         if (!_systemSettingsService.Save(_systemSettings))
         {
@@ -130,9 +136,6 @@ public partial class MainWindow : Window
 
             _loadedDxf = result;
 
-            ShowDxfResult(result);
-            ShowDxfCommands(result);
-
             // Dxf -> Rtc6정수좌표 변환
             if (!PrepareRtc6Commands())
             {
@@ -148,12 +151,16 @@ public partial class MainWindow : Window
                 return;
             }
 
+            ShowDxfResult(result);
+            ShowDxfCommands(result);
+
             DxfProgressBar.Value = 100;
             DxfProgressText.Text = "로드 완료";
 
             AddLog($"DXF 로드 완료: Contour {result.Contours.Count}개, Command {result.Commands.Count}개");
             AddLog($"RTC6 이동 명령 {_rtc6CommandStore.Count}개 변환 완료");
             AddLog($"RTC6 LIST 작성 완료");
+            StartListButton.IsEnabled = true;
 
             foreach (string warning in result.Warnings)
                 AddLog($"DXF 경고: {warning}");
@@ -215,6 +222,8 @@ public partial class MainWindow : Window
         DxfCommandGrid.ItemsSource = null;
         _loadedDxf = null;
         _rtc6CommandStore.Clear();
+        _rtc6ListWriter.InvalidateWrittenList();
+        StartListButton.IsEnabled = false;
 
         SetDxfLoading(true);
         AddLog($"DXF 로드 시작: {filePath}");
@@ -344,6 +353,10 @@ public partial class MainWindow : Window
     /// </summary>
     private void InitializeButton_Click(object sender, RoutedEventArgs e)
     {
+        _rtc6ExecutionCts?.Cancel();
+        _rtc6ListWriter.InvalidateWrittenList();
+        StartListButton.IsEnabled = false;
+
         bool simulationMode = SimulationCheckBox.IsChecked == true;
         string rtc6FolderPath = string.Empty;
         string correctionFilePath = string.Empty;
@@ -437,6 +450,69 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// RTC6 List 1이 작성 완료된 상태인지 확인한 후 execute_list 명령을 전송하고 실제 스캔 출력이 끝날 때까지 상태를 감시합니다.
+    /// </summary>
+    private async void StartListButton_Click(object sender, RoutedEventArgs e)
+    {
+        const uint listNumber = 1;
+
+        if (!_rtc6ListExecutor.Start(listNumber))
+        {
+            AddLog(_rtc6ListExecutor.LastError);
+            MessageBox.Show(_rtc6ListExecutor.LastError, "RTC6 List 실행 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        _rtc6ExecutionCts?.Cancel();
+        _rtc6ExecutionCts?.Dispose();
+        _rtc6ExecutionCts = new CancellationTokenSource();
+
+        SetRtc6Executing(true);
+        StatusText.Text = _rtc6.IsSimulationMode ? "Simulation Running" : "Running";
+        AddLog($"RTC6 List {listNumber} 실행 시작");
+
+        try
+        {
+            bool completed = await _rtc6ListExecutor.WaitForCompletionAsync(20, _rtc6ExecutionCts.Token);
+
+            if (!completed)
+            {
+                string statusError = _rtc6ListExecutor.LastError;
+                _rtc6ListExecutor.Stop();
+                AddLog(statusError);
+                MessageBox.Show(statusError, "RTC6 상태 확인 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            StatusText.Text = _rtc6.IsSimulationMode ? "Simulation" : "Ready";
+            AddLog($"RTC6 List {listNumber} 실행 완료: OutputPosition={_rtc6ListExecutor.LastStatus.OutputPosition}");
+        }
+        catch (OperationCanceledException)
+        {
+            AddLog($"RTC6 List {listNumber} 실행 상태 감시 종료");
+        }
+        finally
+        {
+            SetRtc6Executing(false);
+            _rtc6ExecutionCts?.Dispose();
+            _rtc6ExecutionCts = null;
+        }
+    }
+
+    /// <summary>
+    /// RTC6 List 실행 상태에 따라 Start, DXF, 초기화, 설정 및 수동 이동 버튼의 활성 상태를 변경합니다.
+    /// </summary>
+    private void SetRtc6Executing(bool isExecuting)
+    {
+        StartListButton.IsEnabled = !isExecuting && _rtc6.IsInitialized && _rtc6ListWriter.LastWrittenListNumber == 1 && _rtc6ListWriter.LastWrittenCommandCount > 0;
+        OpenDxfButton.IsEnabled = !isExecuting;
+        InitializeButton.IsEnabled = !isExecuting;
+        OpenSystemSettingsButton.IsEnabled = !isExecuting;
+        MoveButton.IsEnabled = !isExecuting;
+        SimulationCheckBox.IsEnabled = !isExecuting;
+    }
+
+    /// <summary>
     /// RTC6에서 현재 실행 중인 List 및 스캐너 이동을 정지합니다.
     /// </summary>
     private void StopButton_Click(object sender, RoutedEventArgs e)
@@ -452,6 +528,9 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShutdownButton_Click(object sender, RoutedEventArgs e)
     {
+        _rtc6ExecutionCts?.Cancel();
+        _rtc6ListWriter.InvalidateWrittenList();
+        StartListButton.IsEnabled = false;
         _rtc6.Shutdown();
         StatusText.Text = "연결 안 됨";
         AddLog("RTC6 연결 종료");
